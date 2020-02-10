@@ -71,7 +71,7 @@ public class ProductController {
     public ResponseEntity GetProductBy(@PathVariable int id){
         if(id != (int) id)
         {
-            return new ResponseEntity("Missing category name", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Wrong id", HttpStatus.BAD_REQUEST);
         }
 
         BaseService baseService = new BaseServiceImplement(1);
@@ -81,7 +81,8 @@ public class ProductController {
             return new ResponseEntity("Product: " +id +" not found", HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity("Missing category name", HttpStatus.OK);
+        String json = new Gson().toJson(product);
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
     @ApiOperation(value = "Add a product")
