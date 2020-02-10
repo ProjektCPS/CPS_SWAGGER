@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import entities.PredmetPredajaEntity;
 import guru.springframework.domain.Product;
 import guru.springframework.services.ProductService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/product")
-@Api(value="onlinestore", description="All operations for product managment")
+@Api(value="onlinestore", description="All operations for product managment", authorizations = @Authorization(value = "basicAuth"))
 public class ProductController {
 
     private ProductService productService;
