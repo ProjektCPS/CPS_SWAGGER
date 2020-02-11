@@ -43,6 +43,10 @@ public class DiscountController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<TypZlavyEntity> productItems = baseService.getMainDiscountTypes();
         String json = new Gson().toJson(productItems);
@@ -57,7 +61,10 @@ public class DiscountController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
-
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Discount discount = baseService.getDiscount(id);
         if(discount == null)
@@ -76,7 +83,10 @@ public class DiscountController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
-
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         TypZlavyEntity productItems = baseService.getMainDiscountType(id);
         if(productItems == null)
@@ -100,6 +110,10 @@ public class DiscountController {
                 || !data.containsKey("discount-from") || !data.containsKey("discountType"))
         {
             return new ResponseEntity("Payload must contains mandatory property", HttpStatus.BAD_REQUEST);
+        }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
         }
         String discountType = data.get("discountType");
         if(discountType.equals("quantity") || discountType.equals("percent") || discountType.equals("price"))
@@ -129,6 +143,10 @@ public class DiscountController {
         {
             return new ResponseEntity("Payload must contains mandatory property", HttpStatus.BAD_REQUEST);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> categoryItem = baseService.insertMainDiscountType(data);
         if(categoryItem.containsKey("err"))
@@ -153,6 +171,10 @@ public class DiscountController {
         {
             return new ResponseEntity("Payload must contains mandatory property", HttpStatus.BAD_REQUEST);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(1);
         id = data.get("discount-type-id");
         Map<String, String> categoryItem = baseService.updateMainDiscountType(id, data);
@@ -172,6 +194,10 @@ public class DiscountController {
         if(ucet == null)
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
         }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> categoryItem = baseService.deleteMainDiscountType(mainDiscountId);

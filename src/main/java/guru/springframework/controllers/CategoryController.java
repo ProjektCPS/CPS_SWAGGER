@@ -41,7 +41,11 @@ public class CategoryController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<TypPredmetuEntity> productItems = baseService.getProductTypes();
         String json = new Gson().toJson(productItems);
         return  new ResponseEntity(json, HttpStatus.OK);
@@ -55,7 +59,11 @@ public class CategoryController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         TypPredmetuEntity typPredmetu = baseService.getMainCategory(id);
         if(typPredmetu == null)
         {
@@ -73,7 +81,11 @@ public class CategoryController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         KategorieEntity productItems = baseService.getProductCategory(id);
         if(productItems == null)
         {
@@ -91,11 +103,15 @@ public class CategoryController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         if(!data.containsKey("category-name") || !data.containsKey("mainCategoryId"))
         {
             return new ResponseEntity("Payload must contains property: category-name and mainCategoryId", HttpStatus.BAD_REQUEST);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> categoryItem = baseService.insertProductCategory(data);
         if(categoryItem.containsKey("err"))
         {
@@ -117,6 +133,10 @@ public class CategoryController {
         if(!data.containsKey("main-category-name"))
         {
             return new ResponseEntity("Payload must contains property: main-category-name", HttpStatus.BAD_REQUEST);
+        }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
         }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> categoryItem = baseService.insertMainCategory(data);
@@ -141,7 +161,11 @@ public class CategoryController {
         {
             return new ResponseEntity("Payload must contains property: main-category-name", HttpStatus.BAD_REQUEST);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> categoryItem = baseService.updateMainCategory(mainCategoryId, data);
         if(categoryItem.containsKey("err"))
         {

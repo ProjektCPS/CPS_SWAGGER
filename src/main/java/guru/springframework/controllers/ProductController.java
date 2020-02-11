@@ -43,6 +43,10 @@ public class ProductController {
         {
             return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<entities.customEntities.Product> productItems = baseService.getProductAllProduct();
         String json = new Gson().toJson(productItems);
@@ -61,7 +65,10 @@ public class ProductController {
         {
             return new ResponseEntity("Missing category name", HttpStatus.BAD_REQUEST);
         }
-
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<entities.customEntities.Product> productItems = baseService.getProducts(categoryName);
 
@@ -86,7 +93,10 @@ public class ProductController {
         {
             return new ResponseEntity("Wrong id", HttpStatus.BAD_REQUEST);
         }
-
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         PredmetPredajaEntity product = baseService.getProductById(id);
         if(product == null)
@@ -111,6 +121,10 @@ public class ProductController {
         {
             return new ResponseEntity("Payload must contains mandatory data", HttpStatus.BAD_REQUEST);
         }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> newProduct = baseService.insertProduct(data);
         if(newProduct.containsKey("err"))
@@ -134,6 +148,10 @@ public class ProductController {
                 || !data.containsKey("price") || !data.containsKey("unit"))
         {
             return new ResponseEntity("Payload must contains mandatory data", HttpStatus.BAD_REQUEST);
+        }
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
         }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> newProduct = baseService.updateProduct(id, data);
@@ -160,6 +178,10 @@ public class ProductController {
             return new ResponseEntity("ID must be number", HttpStatus.BAD_REQUEST);
         }
 
+        if(ucet.getActive() == 0 || ucet.getTenantId() == null)
+        {
+            return new ResponseEntity("Dont have access or your tenant is not active", HttpStatus.UNAUTHORIZED);
+        }
         BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> removeProduct = baseService.deleteProduct(id);
         if(removeProduct.containsKey("conflict")){
