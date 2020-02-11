@@ -2,7 +2,7 @@ package guru.springframework.controllers;
 
 import com.google.gson.Gson;
 import entities.PredmetPredajaEntity;
-import guru.springframework.domain.Product;
+import entities.UcetEntity;
 import guru.springframework.services.ProductService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import services.BaseService;
 import services.BaseServiceImplement;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -20,14 +21,14 @@ import java.util.Map;
 @Api(value="onlinestore", description="All operations for product managment", authorizations = @Authorization(value = "basicAuth"))
 public class ProductController {
 
-    private ProductService productService;
+    private ProductService authentificationService;
 
     @Autowired
     public void setProductService(ProductService productService) {
-        this.productService = productService;
+        this.authentificationService = productService;
     }
 
-    @ApiOperation(value = "View a list of available products",response = Iterable.class)
+    @ApiOperation(value = "View a list of available products",response = Iterable.class, authorizations = {@Authorization(value="basicAuth")})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved list"),
             @ApiResponse(code = 401, message = "You are not authorized to view the resource"),
@@ -36,22 +37,32 @@ public class ProductController {
     }
     )
     @RequestMapping(value = "/list", method= RequestMethod.GET, produces = "application/json")
-    public String listOfProduct(){
-        BaseService baseService = new BaseServiceImplement(1);
+    public ResponseEntity listOfProduct(HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<entities.customEntities.Product> productItems = baseService.getProductAllProduct();
         String json = new Gson().toJson(productItems);
-        return json;
+        return new ResponseEntity(json, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "View a list of available products in selected category",response = Iterable.class)
+    @ApiOperation(value = "View a list of available products in selected category",response = Iterable.class, authorizations = {@Authorization(value="basicAuth")})
     @RequestMapping(value = "/list/{categoryName}", method= RequestMethod.GET, produces = "application/json")
-    public ResponseEntity listOfProduct(String categoryName){
+    public ResponseEntity listOfProduct(String categoryName, HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
         if(categoryName.isEmpty())
         {
             return new ResponseEntity("Missing category name", HttpStatus.BAD_REQUEST);
         }
 
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         List<entities.customEntities.Product> productItems = baseService.getProducts(categoryName);
 
         if(productItems == null)
@@ -63,15 +74,20 @@ public class ProductController {
         return new ResponseEntity(json, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get product by ID",response = Product.class)
+    @ApiOperation(value = "Get product by ID", authorizations = {@Authorization(value="basicAuth")})
     @RequestMapping(value = "/{id}", method= RequestMethod.GET, produces = "application/json")
-    public ResponseEntity GetProductBy(@PathVariable int id){
+    public ResponseEntity GetProductBy(@PathVariable int id, HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
         if(id != (int) id)
         {
             return new ResponseEntity("Wrong id", HttpStatus.BAD_REQUEST);
         }
 
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         PredmetPredajaEntity product = baseService.getProductById(id);
         if(product == null)
         {
@@ -82,15 +98,20 @@ public class ProductController {
         return new ResponseEntity(json, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Add a product")
+    @ApiOperation(value = "Add a product", authorizations = {@Authorization(value="basicAuth")})
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity saveProduct(@RequestBody Map<String, String> data){
+    public ResponseEntity saveProduct(@RequestBody Map<String, String> data, HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
         if(!data.containsKey("categoryId") || !data.containsKey("name")
                 || !data.containsKey("price") || !data.containsKey("unit"))
         {
             return new ResponseEntity("Payload must contains mandatory data", HttpStatus.BAD_REQUEST);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> newProduct = baseService.insertProduct(data);
         if(newProduct.containsKey("err"))
         {
@@ -101,15 +122,20 @@ public class ProductController {
         return new ResponseEntity("Successfully created", HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Update a product")
+    @ApiOperation(value = "Update a product", authorizations = {@Authorization(value="basicAuth")})
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity updateProduct(@PathVariable Integer id, @RequestBody Map<String, String> data){
+    public ResponseEntity updateProduct(@PathVariable Integer id, @RequestBody Map<String, String> data, HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
         if(id != (int) id ||!data.containsKey("categoryId") || !data.containsKey("name")
                 || !data.containsKey("price") || !data.containsKey("unit"))
         {
             return new ResponseEntity("Payload must contains mandatory data", HttpStatus.BAD_REQUEST);
         }
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> newProduct = baseService.updateProduct(id, data);
         if(newProduct.containsKey("err"))
         {
@@ -120,15 +146,21 @@ public class ProductController {
         return new ResponseEntity("Successfully updated", HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Delete a product")
+    @ApiOperation(value = "Delete a product", authorizations = {@Authorization(value="basicAuth")})
     @RequestMapping(value="/delete/{id}", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity delete(@PathVariable Integer id){
+    public ResponseEntity delete(@PathVariable Integer id, HttpServletRequest httpRequest){
+        UcetEntity ucet = this.authentificationService.authentification(httpRequest);
+        if(ucet == null)
+        {
+            return new ResponseEntity("Wrong user or password: ", HttpStatus.UNAUTHORIZED);
+        }
+
         if(id != (int) id)
         {
             return new ResponseEntity("ID must be number", HttpStatus.BAD_REQUEST);
         }
 
-        BaseService baseService = new BaseServiceImplement(1);
+        BaseService baseService = new BaseServiceImplement(ucet.getTenantId());
         Map<String, String> removeProduct = baseService.deleteProduct(id);
         if(removeProduct.containsKey("conflict")){
             return new ResponseEntity("Unsuccessfull operation because this product has references in other tables", HttpStatus.CONFLICT);
